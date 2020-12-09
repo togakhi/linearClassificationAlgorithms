@@ -66,10 +66,8 @@ class Classifieurs():
                 print("Logistic Regression Classifier - training")
                 clf = classifiers[3]
             elif self.nb_clf == 5:
-                pass
-                # TODO SVM classifier
-                # print("SVM Classifier - training")
-                # clf = classifiers[4]
+                print("SVM Classifier - training")
+                clf = classifiers[4]
             elif self.nb_clf == 6:
                 pass
                 # TODO The last classifier
@@ -104,9 +102,8 @@ class Classifieurs():
                 print("Logistic Regression Classifier - prediction")
                 clf = classifiers[3]
             elif self.nb_clf == 5:
-                pass
-                # print("SVM Classifier - prediction")
-                # clf = classifiers[4]
+                print("SVM Classifier - prediction")
+                clf = classifiers[4]
             elif self.nb_clf == 6:
                 pass
                 # TODO The last classifier
