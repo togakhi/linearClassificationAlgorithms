@@ -1,5 +1,6 @@
 #
-from src.Data_Management import Data_Management
+from Classifieurs import Classifieurs as clf
+from src.Data_Management import Data_Management as dm
 
 
 def print_hi(name):
@@ -13,7 +14,7 @@ if __name__ == '__main__':
     This is the main function for running the code
     :return:
     '''
-    data = Data_Management()
+    data = dm()
     print("\nPrinting some data for quick observation ...\n")
     data.printSomeData()
 
@@ -28,5 +29,17 @@ if __name__ == '__main__':
 
     print("\n Printing the Correlation between variables ...\n")
     print(data.correlation())
+
+    classifieur = clf(0)
+
+    [x_train, y_train, x_test, y_test] = data.getData()
+
+    classifieur.entrainement(x_train, y_train)
+
+    classifieur.prediction(x_test, y_test)
+
+    #classifieur.loss_calcul(x_test, y_test)
+    # Test the leaf_image function
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

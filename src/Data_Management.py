@@ -10,7 +10,9 @@
 
 
 # imports des libs nécessaires
-import pandas as pd
+import PIL.Image
+import cv2
+import numpy as np
 from pandas.plotting import scatter_matrix
 from matplotlib import pyplot
 import matplotlib.pyplot as plt
@@ -49,7 +51,7 @@ class Data_Management:
         x = data_train.iloc[:, 2:]
         y = data_train['species'].astype('category')
         # y = y.cat.codes.as_matrix()
-        self.data_Y_train = y
+        self.data_y_train = y
         sss = StratifiedShuffleSplit(10, 0.2, random_state=15)
         for train_index, test_index in sss.split(x, y):
             self.x_train, self.x_test = x.iloc[train_index], x.iloc[test_index]
@@ -58,14 +60,14 @@ class Data_Management:
         self.className = list(le.classes_)
         # submission_data = pd.read_csv('./data/sample_submission.csv')
         # categories = submission_data.columns.values[1:]
-        self.x_test = data_test.iloc[:, 1:]
+        # self.x_test = data_test.iloc[:, 1:]
         self.id = data_test.iloc[:, 0]
 
     def printSomeData(self):
-        '''
+        """
             Affiche des données
             :return:
-            '''
+            """
         printing = self.data_to_print[['id', 'species', 'margin20', 'shape20', 'texture20']]
         print(printing)
 
@@ -76,7 +78,7 @@ class Data_Management:
             '''
         print(self.data_to_print.shape)
 
-    def getData(self, showData=False, n=5):
+    def getData(self, showData=True, n=5):
         """
             Accesseurs sur les données
             :param n: Le nombre de lignes à afficher
@@ -85,11 +87,11 @@ class Data_Management:
             """
         if showData:
             print('data_train:/n ')
-            print(self.X_train.head(n))
+            print(self.data_x_train.head(n))
             print('/n/n')
             print('data_test:/n')
-            print(self.y_train.head(n))
-        return self.X_train, self.y_train, self.X_test, self.y_test
+            print(self.data_y_train.head(n))
+        return self.data_x_train, self.data_y_train, self.x_test, self.y_test
 
     def dataDescription(self):
         """
@@ -136,7 +138,6 @@ class Data_Management:
         corr = x_corr.corr(method='pearson')
         print(corr)
 
-
     def pca(self, x):
         """
             projette les données
@@ -147,7 +148,6 @@ class Data_Management:
         pca_model = decomposition.PCA()
         return pca_model.fit_transform(x)
 
-
     def scale(self, X):
         """
             fonction qui transforme les données dans l'intervalle [0,1]
@@ -157,3 +157,39 @@ class Data_Management:
         min_max_scalar = preprocessing.MinMaxScaler()
         x_transform = min_max_scalar.fit_transform(X)
         return x_transform
+
+
+def leaf_image(image_id, target_length=160):
+    """
+    `image_id` should be the index of the images in the images/ folder
+
+    Reture the images of a given id(1~1584) with the target size (target_length x target_length)
+
+    """
+
+    image_name = str(image_id) + '.jpg'
+    leaf_img = plt.imread("C:/Users/Tariq/PycharmProjects/pythonProject/src/images/343.png")  # Reading in the images
+    leaf_img_width = leaf_img.shape[1]
+    leaf_img_height = leaf_img.shape[0]
+    # target_length = 160
+    show_img = PIL.Image.open("C:/Users/Tariq/PycharmProjects/pythonProject/src/images/343.png")
+    show_img.show()
+    img_target = np.zeros((target_length, target_length), np.uint8)
+    if leaf_img_width >= leaf_img_height:
+        scale_img_width = target_length
+        scale_img_height = int((float(scale_img_width) / leaf_img_width) * leaf_img_height)
+        img_scaled = cv2.resize(leaf_img, (scale_img_width, scale_img_height), interpolation=cv2.INTER_AREA)
+        copy_location = (target_length - scale_img_height) / 2
+        img_target[int(copy_location):int(copy_location + scale_img_height), :] = img_scaled
+    else:
+        # leaf_img_width < leaf_img_height:
+        scale_img_height = target_length
+        print(scale_img_height)
+        scale_img_width = int((float(scale_img_height) / leaf_img_height) * leaf_img_width)
+        img_scaled = cv2.resize(leaf_img, (scale_img_width, scale_img_height), interpolation=cv2.INTER_AREA)
+        copy_location = (target_length - scale_img_width) / 2
+        print(copy_location)
+        print(scale_img_width)
+        # img_target[:, int(copy_location):copy_location + scale_img_width] = img_scaled
+
+    return img_scaled
