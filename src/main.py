@@ -1,5 +1,7 @@
 #
+from Calculs_Classifieurs import Calculs_Classifieurs
 from Classifieurs import Classifieurs as clf
+from Graphique import Graphique
 from src.Data_Management import Data_Management as dm
 
 
@@ -21,15 +23,24 @@ if __name__ == '__main__':
     print("\n Matrice de corrélation :\n")
     data.correlationMatrix()
 
-    print("\n Affichage de l'histogramme...\n")
-    data.univariantePlot()
+    # print("\n Affichage de l'histogramme...\n")
+    # data.univariantePlot()
 
-    classifieur = clf(0)
+    clf = Calculs_Classifieurs()
 
-    [x_train, y_train, x_test, y_test] = data.getData()
+    print("\n Entrainement des données...\n")
+    clf.train()
 
-    classifieur.entrainement(x_train, y_train)
+    print("\n Validation croisée avec les donnèes transformées...\n")
+    clf.cross_validation_results(transform=True)
 
-    classifieur.prediction(x_test, y_test)
+    print("\n Validation croisée sans les donnèes transformées...\n")
+    clf.cross_validation_results(transform=False)
+
+    print("\n Prediction des données...\n")
+    clf.affich_predict(clf.predict())
+
+    graph = Graphique()
+    graph.affichAccuracy()
 
     #classifieur.loss_calcul(x_test, y_test)

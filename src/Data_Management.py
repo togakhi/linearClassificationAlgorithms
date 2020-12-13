@@ -28,13 +28,11 @@ class Data_Management(object):
         Classe DataManagement permettant de préparer les données
     '''
 
-    def __init__(self, n_component=10):
+    def __init__(self):
         """
             Importation des données de la BDD leaf
-            :param n_component:
         """
         # récupération des données d'entrainement
-        self.n_component = n_component
         data_train = pd.read_csv("C:/Users/Tariq/PycharmProjects/pythonProject/src/data/train.csv")
         self.data_to_print = data_train
 
@@ -43,6 +41,8 @@ class Data_Management(object):
 
         # on enlève les 2 premières colonnes
         x = data_train.iloc[:, 2:]
+
+        self.data_x_train = x
 
         # on convertit la colonne species en un dtype = category
         y = data_train['species'].astype('category')
@@ -59,9 +59,9 @@ class Data_Management(object):
         le = LabelEncoder().fit(data_train.iloc[:, 1])
 
         self.className = list(le.classes_)
-        submission_data = pd.read_csv('./data/sample_submission.csv')
-        categories = submission_data.columns.values[1:]
-        self.x_test = data_test.iloc[:, 1:]
+        # submission_data = pd.read_csv('./data/sample_submission.csv')
+        # categories = submission_data.columns.values[1:]
+        self.data_test = data_test.iloc[:, 1:]
         self.id = data_test.iloc[:, 0]
 
     def printData(self):
@@ -84,7 +84,7 @@ class Data_Management(object):
     def getData(self):
         """
             Getters sur les données
-            :return: self.X_train, self.y_train, self.X_test, self.y_test
+            :return: self.x_train, self.y_train, self.x_test, self.y_test
             """
         return self.x_train, self.y_train, self.x_test, self.y_test
 
