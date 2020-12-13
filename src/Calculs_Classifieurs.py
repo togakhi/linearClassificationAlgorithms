@@ -1,4 +1,3 @@
-
 from Classifieurs import *
 
 
@@ -15,19 +14,43 @@ class Calculs_Classifieurs(Classifieurs):
         Fonction qui gère l'entrainement
         :return: None
         """
+        x_train = self.scale(self.X_train)
+        y_train = self.y_train
+        print('SVM entrainement...')
+        self.svm.fit(x_train, y_train)
         print('KNN entrainement...')
-        self.knn.fit(self.x_train, self.y_train)
+        self.knn.fit(x_train, y_train)
+        print('LR entrainement...')
+        self.lr.fit(x_train, y_train)
+        print('NN entrainement...')
+        self.nn.fit(x_train, y_train)
 
     def predict(self):
         """
         Fonction qui retourne la prediction
         :return: la prediction
         """
+        X_test = self.scale(self.data_test)
+        prediction = {str('SVM prediction'): ''}
+        for n in range(len(self.data_test)):
+            class_index = self.svm.predict([X_test.iloc[n]])
+            prediction[str('x[') + str(n) + str(']') +
+                       str(self.id[n])] = self.className[class_index[0]]
         prediction = {str('KNN prediction'): ''}
         for n in range(len(self.data_test)):
-            index_class = self.knn.predict([self.data_test.iloc[n]])
+            class_index = self.knn.predict([X_test.iloc[n]])
             prediction[str('x[') + str(n) + str(']') +
-                       str(self.id[n])] = self.className[index_class[0]]
+                       str(self.id[n])] = self.className[class_index[0]]
+        prediction = {str('LR prediction'): ''}
+        for n in range(len(self.data_test)):
+            class_index = self.lr.predict([X_test.iloc[n]])
+            prediction[str('x[') + str(n) + str(']') +
+                       str(self.id[n])] = self.className[class_index[0]]
+        prediction = {str('NN prediction'): ''}
+        for n in range(len(self.data_test)):
+            class_index = self.nn.predict([X_test.iloc[n]])
+            prediction[str('x[') + str(n) + str(']') +
+                       str(self.id[n])] = self.className[class_index[0]]
 
         return prediction
 
@@ -39,15 +62,27 @@ class Calculs_Classifieurs(Classifieurs):
         for key, value in prediction.items():
             print(key, ' : ', value)
 
-    def cross_validation_results(self, transform=True):
+    def cross_validation_results(self):
         """
         Fonction qui retourne le score des validations croisées
         :return: le score
         """
         score = {}
 
-        print(' Cross validation pour le classifieur KNN...\n')
-        print(self.crossValidationModel(model=self.knn, transform=transform))
-        score['KNN accuracy: '] = self.crossValidationModel(model=self.knn, transform=transform)
+        print('Cross validation pour le classifieur SVM...\n')
+        print(self.crossValidationModel(model=self.lr))
+        score['SVM accuracy: '] = self.crossValidationModel(model=self.svm)
+
+        print('Cross validation pour le classifieur KNN...\n')
+        print(self.crossValidationModel(model=self.knn))
+        score['KNN accuracy: '] = self.crossValidationModel(model=self.knn)
+
+        print('Cross validation pour le classifieur LR...\n')
+        print(self.crossValidationModel(model=self.lr))
+        score['LR accuracy: '] = self.crossValidationModel(model=self.lr)
+
+        print('Cross validation pour le classifieur NN...\n')
+        print(self.crossValidationModel(model=self.nn))
+        score['NN accuracy: '] = self.crossValidationModel(model=self.nn)
 
         return score

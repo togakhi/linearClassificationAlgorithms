@@ -37,12 +37,12 @@ class Data_Management(object):
         self.data_to_print = data_train
 
         # récupération données de test
-        data_test = pd.read_csv("C:/Users/Tariq/PycharmProjects/pythonProject/src/data/test.csv")
+        self.data_test = pd.read_csv("C:/Users/Tariq/PycharmProjects/pythonProject/src/data/test.csv")
 
         # on enlève les 2 premières colonnes
-        x = data_train.iloc[:, 2:]
+        self.data_X_train  = data_train.iloc[:, 2:]
 
-        self.data_x_train = x
+        X = self.data_X_train
 
         # on convertit la colonne species en un dtype = category
         y = data_train['species'].astype('category')
@@ -52,8 +52,8 @@ class Data_Management(object):
 
         sss = StratifiedShuffleSplit(10, 0.2, random_state=15)
 
-        for train_index, test_index in sss.split(x, y):
-            self.x_train, self.x_test = x.iloc[train_index], x.iloc[test_index]
+        for train_index, test_index in sss.split(X, y):
+            self.X_train, self.X_test = X.iloc[train_index], X.iloc[test_index]
             self.y_train, self.y_test = y[train_index], y[test_index]
 
         le = LabelEncoder().fit(data_train.iloc[:, 1])
@@ -61,8 +61,8 @@ class Data_Management(object):
         self.className = list(le.classes_)
         # submission_data = pd.read_csv('./data/sample_submission.csv')
         # categories = submission_data.columns.values[1:]
-        self.data_test = data_test.iloc[:, 1:]
-        self.id = data_test.iloc[:, 0]
+        self.data_X_test = self.data_test.iloc[:, 1:]
+        self.id = self.data_test.iloc[:, 0]
 
     def printData(self):
         """
@@ -77,8 +77,8 @@ class Data_Management(object):
             Getters sur la forme des données
             :return:
             '''
-        print('Il y a {}'.format(self.x_train.shape[0]),
-              'échantillons pour entraîner notre modèle et {}'.format(self.x_test.shape[0]),
+        print('Il y a {}'.format(self.data_to_print.shape[0]),
+              'échantillons pour entraîner notre modèle et {}'.format(self.data_test.shape[0]),
               'échantiollons de test pour évaluer notre modèle.')
 
     def getData(self):
@@ -86,14 +86,14 @@ class Data_Management(object):
             Getters sur les données
             :return: self.x_train, self.y_train, self.x_test, self.y_test
             """
-        return self.x_train, self.y_train, self.x_test, self.y_test
+        return self.X_train, self.y_train, self.X_test, self.y_test
 
     def dataDescription(self):
         """
             fonction qui retourne une description statiques des données
             :return: une description des données
             """
-        x = self.x_train[['margin20', 'shape20', 'texture20']]
+        x = self.X_train[['margin20', 'shape20', 'texture20']]
         return x.describe()
 
     def classDistribution(self):
@@ -107,7 +107,7 @@ class Data_Management(object):
         """
             affiche un histogramme afin de voir si les données suivent une gaussienne
         """
-        data = self.x_train.loc[:, 'texture45']
+        data = self.X_train.loc[:, 'texture45']
         sns.distplot(data, hist=True, kde=True, bins=int(len(data) / 20), color='darkblue',
                      hist_kws={'edgecolor': 'black'}, kde_kws={'linewidth': 4})
         pyplot.show()
@@ -117,7 +117,7 @@ class Data_Management(object):
             Affiche la matrice de corrélation entre toutes les données
         """
         set_option('precision', 3)
-        x_corr = self.x_train[['margin10', 'shape10', 'texture10', 'margin20', 'shape20', 'texture20']]
+        x_corr = self.X_train[['margin10', 'shape10', 'texture10', 'margin20', 'shape20', 'texture20']]
         corr = x_corr.corr(method='pearson')
         print(corr)
 

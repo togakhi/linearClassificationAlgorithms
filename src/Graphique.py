@@ -1,5 +1,5 @@
 from Classifieurs import *
-from sklearn import metrics
+from sklearn.metrics import accuracy_score, log_loss
 from sklearn.utils.multiclass import unique_labels
 import matplotlib.pyplot as plt
 
@@ -18,30 +18,36 @@ class Graphique(Classifieurs):
         :param model: the modèle à entrainer
         :return:
         """
-        model.fit(self.scale(self.x_train), self.y_train)
-        predict = model.predict(self.scale(self.x_test))
-        accuracy = metrics.accuracy_score(self.y_test, predict)
+        model.fit(self.scale(self.X_train), self.y_train)
+        predict = model.predict(self.scale(self.X_test))
+        accuracy = accuracy_score(self.y_test, predict)
         return accuracy
+
+    def calculate_Accuracy_From_Cross_Validation(self, model):
+        """
+        Fonction qui calcule l'accuracy du modèle passé en paramètre
+        après la validation croisée du modèle
+        :param model: le modèle en question
+        :return: l'accuracy du modèle
+        """
+        return self.crossValidationModel(model=model)
 
     def affichAccuracy(self):
         """
         Fonction qui affiche l'accuracy de chaque classifieur
         """
         clf = self.getAllClassifiers()
-        accuracy_list = list()
+        # accuracy_list = list()
         columns = ['Classifieurs', 'Précision (en %)']
-        columns_clf = ['KNN']
+        columns_clf = ['SVM', 'KNN', 'LR', 'NN']
         log = pd.DataFrame(columns=columns)
-        i=0
+        i = 0
         for c in clf:
-            print('Accuracy for KNN is ' + str(self.calculateAccuracy(c)))
-            #accuracy_list = accuracy_list.append(self.calculateAccuracy(c))
-        # for i in range(0, len(clf)):
             log = log.append(pd.DataFrame([[columns_clf[i], 100 * self.calculateAccuracy(c)]], columns=columns),
-                       ignore_index=True)
+                             ignore_index=True)
             i += 1
 
-        sns.barplot(x='Précision (en %)', y='Classifieurs', data=log, color='blue', alpha=0.4)
+        sns.barplot(x='Précision (en %)', y='Classifieurs', data=log, color='black', alpha=0.4)
         plt.xlabel('Accuracy (en %)')
         # plt.savefig('accuracy.pdf')
         plt.show()
