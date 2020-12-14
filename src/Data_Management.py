@@ -35,6 +35,11 @@ class Data_Management(object):
         """
             Importation des données de la BDD leaf
         """
+        # ======================================================================================
+        # Modifier le booleen cross_val pour l'utilisation de la validation croisée :
+        # ======================================================================================
+        self.cross_val = True
+
         # récupération des données d'entrainement
         data_train = pd.read_csv("C:/Users/Tariq/PycharmProjects/pythonProject/src/data/train.csv")
         self.data_to_print = data_train
@@ -45,6 +50,7 @@ class Data_Management(object):
         # on enlève les 2 premières colonnes
         self.data_X_train = data_train.iloc[:, 2:]
 
+        self.data_X_test = self.data_test.iloc[:, 1:]
         X = self.data_X_train
 
         # on convertit la colonne species en un dtype = category
@@ -52,7 +58,6 @@ class Data_Management(object):
         y = y.cat.codes.to_numpy()
 
         self.data_y_train = y
-
         sss = StratifiedShuffleSplit(10, 0.2, random_state=15)
 
         for train_index, test_index in sss.split(X, y):
@@ -60,14 +65,17 @@ class Data_Management(object):
             self.y_train, self.y_test = y[train_index], y[test_index]
 
         le = LabelEncoder().fit(data_train.iloc[:, 1])
+        self.classes = list(le.classes_)
+        self.test_id = self.data_test.iloc[:, 0]
 
-        self.className = list(le.classes_)
-        # submission_data = pd.read_csv('./data/sample_submission.csv')
-        # categories = submission_data.columns.values[1:]
-        self.data_X_test = self.data_test.iloc[:, 1:]
-        self.id = self.data_test.iloc[:, 0]
+    def get_cross_validation(self):
+        """
+        Getters du booléen de la cross_val
+        :param cross_val:
+        """
+        return self.cross_val
 
-    def printData(self):
+    def print_data(self):
         """
             Affiche toutes les données d'entraînement
             :return:
@@ -75,38 +83,37 @@ class Data_Management(object):
         printing = self.data_to_print[['id', 'species', 'margin20', 'shape20', 'texture20']]
         print(printing)
 
-    def getShape(self):
-        '''
+    def get_shape_ind_0(self):
+        """
             Getters sur la forme des données
             :return:
-            '''
+            """
         print('Il y a {}'.format(self.data_to_print.shape[0]),
               'échantillons pour entraîner notre modèle et {}'.format(self.data_test.shape[0]),
               'échantiollons de test pour évaluer notre modèle.')
 
-    def getData(self):
+    def get_data(self):
         """
             Getters sur les données
             :return: self.x_train, self.y_train, self.x_test, self.y_test
             """
         return self.X_train, self.y_train, self.X_test, self.y_test
 
-    def dataDescription(self):
+    def data_desc(self):
         """
             fonction qui retourne une description statiques des données
             :return: une description des données
             """
-        x = self.X_train[['margin20', 'shape20', 'texture20']]
-        return x.describe()
+        return self.X_train[['margin20', 'shape20', 'texture20']].describe()
 
-    def classDistribution(self):
+    def class_distribution(self):
         """
             retourne le nombre d'instance dans chaque classe
             :return: les espèces avec leurs tailles respectives
             """
         return self.data_to_print.groupby('species').size()
 
-    def univariantePlot(self):
+    def univariante_plot(self):
         """
             affiche un histogramme afin de voir si les données suivent une gaussienne
         """
@@ -115,7 +122,7 @@ class Data_Management(object):
                      hist_kws={'edgecolor': 'black'}, kde_kws={'linewidth': 4})
         plt.show()
 
-    def correlationMatrix(self):
+    def correlation_matrix(self):
         """
             Affiche la matrice de corrélation entre toutes les données
         """
@@ -124,25 +131,13 @@ class Data_Management(object):
         corr = x_corr.corr(method='pearson')
         print(corr)
 
-    def pca(self, x):
-        """
-            projette les données
-            :param x: les données à projeter
-            :param n_components: le nombre d'élèments à garder
-            :return: les données projettées dans une n_components dimension
-        """
-        pca_model = decomposition.PCA()
-        return pca_model.fit_transform(x)
-
     def scale(self, X):
         """
             fonction qui transforme les données dans l'intervalle [0,1]
             :param X: les données à transformer
             :return: les données transformées
             """
-        min_max_scalar = preprocessing.MinMaxScaler()
-        x_transform = min_max_scalar.fit_transform(X)
-        return x_transform
+        return preprocessing.MinMaxScaler().fit_transform(X)
 
     def visualization(self):
         """
