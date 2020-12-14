@@ -18,7 +18,8 @@ class Classifieurs(Cross_Validation):
 
     def __init__(self, cross_val=False):
         super(Classifieurs, self).__init__()
-        if cross_val:
+        self.cross_val = cross_val
+        if self.cross_val:
             # initialisation du KNN Classifier
             self.crossValidationKNN()
             self.knn = KNeighborsClassifier(n_neighbors=self.n_neighbors)
@@ -51,7 +52,7 @@ class Classifieurs(Cross_Validation):
             self.lr = LogisticRegression()
 
             # initialisation du SVM Classifier
-            self.svm = SVC()
+            self.svm = SVC(probability=True)
 
             # initialisation du Neural Network Classifier
             self.nn = MLPClassifier()
@@ -62,7 +63,7 @@ class Classifieurs(Cross_Validation):
             # initialisation du Random Forest Classifier
             self.rf = RandomForestClassifier()
 
-    def getAllClassifiers(self):
+    def get_all_classifiers(self):
         """
         fonction qui retourne les 6 classifieurs sous forme de liste
         :return: liste de classifieurs

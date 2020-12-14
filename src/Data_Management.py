@@ -12,8 +12,11 @@
 import warnings
 import pandas as pd
 import seaborn as sns
+
+sns.set_palette('husl')
+import matplotlib.pyplot as plt
+
 # imports des libs nécessaires
-from matplotlib import pyplot
 from sklearn import decomposition
 from sklearn import preprocessing
 from sklearn.model_selection import StratifiedShuffleSplit
@@ -40,7 +43,7 @@ class Data_Management(object):
         self.data_test = pd.read_csv("C:/Users/Tariq/PycharmProjects/pythonProject/src/data/test.csv")
 
         # on enlève les 2 premières colonnes
-        self.data_X_train  = data_train.iloc[:, 2:]
+        self.data_X_train = data_train.iloc[:, 2:]
 
         X = self.data_X_train
 
@@ -110,7 +113,7 @@ class Data_Management(object):
         data = self.X_train.loc[:, 'texture45']
         sns.distplot(data, hist=True, kde=True, bins=int(len(data) / 20), color='darkblue',
                      hist_kws={'edgecolor': 'black'}, kde_kws={'linewidth': 4})
-        pyplot.show()
+        plt.show()
 
     def correlationMatrix(self):
         """
@@ -140,3 +143,13 @@ class Data_Management(object):
         min_max_scalar = preprocessing.MinMaxScaler()
         x_transform = min_max_scalar.fit_transform(X)
         return x_transform
+
+    def visualization(self):
+        """
+            Affiche des données d'entraînement en plot
+            :return:
+            """
+        vis = self.data_to_print[['id', 'species', 'margin20', 'shape20', 'texture20']]
+        sns.pairplot(vis, hue='species', markers='+')
+        plt.show()
+        print(vis)

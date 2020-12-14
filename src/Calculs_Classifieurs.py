@@ -9,12 +9,17 @@ class Calculs_Classifieurs(Classifieurs):
     def __init__(self):
         super(Calculs_Classifieurs, self).__init__()
 
-    def train(self):
+    def train(self, scaled_data=True):
         """
         Fonction qui gère l'entrainement
+        :param: scaled_data : booléen pour savoir si les données ont été transformées ou pas
         :return: None
         """
-        x_train = self.scale(self.X_train)
+        if scaled_data :
+            x_train = self.scale(self.X_train)
+        else:
+            x_train = self.X_train
+
         y_train = self.y_train
         print('SVM entrainement...')
         self.svm.fit(x_train, y_train)
@@ -29,12 +34,17 @@ class Calculs_Classifieurs(Classifieurs):
         print('Random Forest entrainement...')
         self.rf.fit(x_train, y_train)
 
-    def predict(self):
+    def predict(self, scaled_data=True):
         """
         Fonction qui retourne la prediction
-        :return: la prediction
+        :param: scaled_data : booléen pour savoir si les données ont été transformées ou pas
+        :return: La prediction
         """
-        X_test = self.scale(self.data_test)
+        if scaled_data :
+            X_test = self.scale(self.data_test)
+        else:
+            X_test = self.data_test
+
         prediction = {str('SVM prediction'): ''}
         for n in range(len(self.data_test)):
             class_index = self.svm.predict([X_test.iloc[n]])

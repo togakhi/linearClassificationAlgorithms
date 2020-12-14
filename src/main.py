@@ -39,8 +39,11 @@ if __name__ == '__main__':
     # clf.train()
 
     print("\nAffichage de l'accuracy sans validation croisée...\n")
-    graph.affichAccuracy()
-
+    graph.affich_accuracy()
+    print("\nAffichage de loss sans validation croisée...\n")
+    graph.affich_loss()
+    print("\nAffichage de f1_score sans validation croisée...\n")
+    graph.affich_f1_score()
     # print("\nValidation croisée avec les donnèes transformées...\n")
     # print(clf.cross_validation_results())
 

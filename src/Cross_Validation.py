@@ -13,11 +13,15 @@ class Cross_Validation(Data_Management):
     Classe permettant de faire la validation croisée pour tout nos classifieurs
     """
 
-    def __init__(self):
+    def __init__(self, scaled_data=True):
         super().__init__()
 
         # initialisation de paramètres pour les validation croisée
-        self.x_data_scale = self.scale(self.data_X_train)
+        if scaled_data:
+            self.x_data_scale = self.scale(self.data_X_train)
+        else:
+            self.x_data_scale = self.data_X_train
+
         self.num_folds = 10
         self.seed = 7
         self.scoring = 'accuracy'
@@ -60,8 +64,8 @@ class Cross_Validation(Data_Management):
         :return:
         """
         print("Recherche des meilleurs paramètres du AdaBoost Classifier...")
-        n_estimators = [5, 15, 25, 35, 50, 65, 75, 85, 90, 100]
-        learning_rate_ada = [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6]
+        n_estimators = [25, 50, 75]
+        learning_rate_ada = [0.5, 1, 1.5]
         grid_param = dict(n_estimators=n_estimators, learning_rate=learning_rate_ada)
         model = AdaBoostClassifier()
         kfold = kf(n_splits=self.num_folds, random_state=self.seed)
@@ -78,10 +82,10 @@ class Cross_Validation(Data_Management):
         print("Recherche des meilleurs paramètres du Random Forest Classifier...")
         n_estimators = [50, 100, 150]
         criterion = ['gini', 'entropy']
-        max_depth = [10, 50, 100, 200]
+        max_depth = [10, 50, 100]
         max_features = ['auto', 'sqrt', 'log2']
-        min_samples_split = [0.5, 1, 1.5, 2, 2.5, 3, 3.5]
-        min_samples_leaf = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75]
+        min_samples_split = [1, 2, 3,]
+        min_samples_leaf = [0.5, 1, 1.5]
         bootstrap = [True, False]
         grid_param = dict(n_estimators=n_estimators, criterion=criterion, max_depth=max_depth,
                           max_features=max_features, min_samples_split=min_samples_split, min_samples_leaf=min_samples_leaf,
@@ -119,7 +123,7 @@ class Cross_Validation(Data_Management):
         afin de trouver les meilleurs paramètres
         """
         print("Recherche des meilleurs paramètres du Logistic Regression Classifier...")
-        C = [1, 10, 20, 50, 1000, 2000]
+        C = [1, 10, 50, 1000, 2000]
         tol = [0.005, 0.003, 0.001]
         grid_param = dict(C=C, tol=tol)
         model = LogisticRegression(solver='newton-cg', multi_class='multinomial')
@@ -135,7 +139,7 @@ class Cross_Validation(Data_Management):
         :return:
         """
         print("Recherche des meilleurs paramètres du SVM Classifier...")
-        C_value = [0.1, 0.5, 0.7, 1.0, 1.3, 1.7, 2]
+        C_value = [0.1, 0.5, 0.7, 1.0, 1.3, 1.5, 1.9]
         kernel = ['linear', 'poly', 'rbf', 'sigmoid']
         param_grid = dict(C=C_value, kernel=kernel)
         model = SVC()
