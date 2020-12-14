@@ -1,12 +1,11 @@
-from sklearn.model_selection import GridSearchCV as gridsearchcv, KFold as kf, cross_val_score as cvs, \
-    cross_val_predict as cvp
+from sklearn.ensemble import *
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV as gridsearchcv, KFold as kf, cross_val_score as cvs
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
 
 from Data_Management import *
-
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
 
 
 class Cross_Validation(Data_Management):
@@ -34,6 +33,15 @@ class Cross_Validation(Data_Management):
         self.activation = 'identity'
         self.learning_rate = 'constant'
         self.learning_rate_init = None
+        self.n_estimators = None
+        self.learning_rate_ada = 1
+        self.n_estimators_rf = 100
+        self.criterion = 'gini'
+        self.max_depths = None
+        self.max_features = 'auto'
+        self.min_samples_split = 2
+        self.min_samples_leaf = 1
+        self.bootstrap = True
 
     def crossValidationModel(self, model=None):
         """
@@ -51,14 +59,44 @@ class Cross_Validation(Data_Management):
         Effectue la validation croisée pour le classifieurs AdaBoost
         :return:
         """
-        pass
+        print("Recherche des meilleurs paramètres du AdaBoost Classifier...")
+        n_estimators = [5, 15, 25, 35, 50, 65, 75, 85, 90, 100]
+        learning_rate_ada = [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6]
+        grid_param = dict(n_estimators=n_estimators, learning_rate=learning_rate_ada)
+        model = AdaBoostClassifier()
+        kfold = kf(n_splits=self.num_folds, random_state=self.seed)
+        grid = gridsearchcv(estimator=model, param_grid=grid_param, scoring=self.scoring, cv=kfold)
+        grid_result = grid.fit(self.x_data_scale, self.data_y_train)
+        self.n_estimators = grid_result.best_params_['n_estimators']
+        self.learning_rate_ada = grid_result.best_params_['learning_rate']
 
     def crossValidationRandomForest(self):
         """
         Effectue la validation croisée pour le classifieurs Random Forest
         :return:
         """
-        pass
+        print("Recherche des meilleurs paramètres du Random Forest Classifier...")
+        n_estimators = [50, 100, 150]
+        criterion = ['gini', 'entropy']
+        max_depth = [10, 50, 100, 200]
+        max_features = ['auto', 'sqrt', 'log2']
+        min_samples_split = [0.5, 1, 1.5, 2, 2.5, 3, 3.5]
+        min_samples_leaf = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75]
+        bootstrap = [True, False]
+        grid_param = dict(n_estimators=n_estimators, criterion=criterion, max_depth=max_depth,
+                          max_features=max_features, min_samples_split=min_samples_split, min_samples_leaf=min_samples_leaf,
+                          bootstrap=bootstrap,)
+        model = RandomForestClassifier()
+        kfold = kf(n_splits=self.num_folds, random_state=self.seed)
+        grid = gridsearchcv(estimator=model, param_grid=grid_param, scoring=self.scoring, cv=kfold)
+        grid_result = grid.fit(self.x_data_scale, self.data_y_train)
+        self.n_estimators_rf = grid_result.best_params_['n_estimators']
+        self.criterion = grid_result.best_params_['criterion']
+        self.max_depths = grid_result.best_params_['max_depth']
+        self.max_features = grid_result.best_params_['max_features']
+        self.min_samples_split = grid_result.best_params_['min_samples_split']
+        self.min_samples_leaf = grid_result.best_params_['min_samples_leaf']
+        self.bootstrap = grid_result.best_params_['bootstrap']
 
     def crossValidationKNN(self):
         """
@@ -71,7 +109,7 @@ class Cross_Validation(Data_Management):
         model = KNeighborsClassifier()
         kfold = kf(n_splits=self.num_folds, random_state=self.seed)
         grid = gridsearchcv(estimator=model, param_grid=grid_param, scoring=self.scoring, cv=kfold)
-        grid_result = grid.fit(self.x_data_scale, self.y_train)
+        grid_result = grid.fit(self.x_data_scale, self.data_y_train)
 
         self.n_neighbors = grid_result.best_params_['n_neighbors']
 
@@ -87,11 +125,9 @@ class Cross_Validation(Data_Management):
         model = LogisticRegression(solver='newton-cg', multi_class='multinomial')
         kfold = kf(n_splits=self.num_folds, random_state=self.seed)
         grid = gridsearchcv(estimator=model, param_grid=grid_param, scoring=self.scoring, cv=kfold)
-        grid_result = grid.fit(self.x_data_scale, self.y_train)
-        c = grid_result.best_params_['C']
-        tol = grid_result.best_params_['tol']
-        self.C = c
-        self.tol = tol
+        grid_result = grid.fit(self.x_data_scale, self.data_y_train)
+        self.C = grid_result.best_params_['C']
+        self.tol = grid_result.best_params_['tol']
 
     def crossValidationSVM(self):
         """
@@ -105,17 +141,16 @@ class Cross_Validation(Data_Management):
         model = SVC()
         kfold = kf(n_splits=self.num_folds, random_state=self.seed)
         grid = gridsearchcv(estimator=model, param_grid=param_grid, scoring=self.scoring, cv=kfold)
-        grid_result = grid.fit(self.x_data_scale, self.y_train)
-        C = grid_result.best_params_['C']
-        kernel = grid_result.best_params_['kernel']
-        self.C_svm = C
-        self.kernel = kernel
+        grid_result = grid.fit(self.x_data_scale, self.data_y_train)
+        self.C_svm = grid_result.best_params_['C']
+        self.kernel = grid_result.best_params_['kernel']
 
     def crossValidationNN(self):
         """
         Effectue la validation croisée pour le classifieurs Neural Networks
         :return:
         """
+        print("Recherche des meilleurs paramètres du Neural Network Classifier...")
         solver = ['lbfgs', 'sgd', 'adam']
         activation = ['identity', 'logistic', 'tanh', 'relu']
         learning_rate = ['constant', 'invscaling', 'adaptive']
@@ -125,12 +160,8 @@ class Cross_Validation(Data_Management):
         model = MLPClassifier()
         kfold = kf(n_splits=self.num_folds, random_state=self.seed)
         grid = gridsearchcv(estimator=model, param_grid=param_grid, scoring=self.scoring, cv=kfold)
-        grid_result = grid.fit(self.x_data_scale, self.y_train)
-        solver = grid_result.best_params_['solver']
-        activation = grid_result.best_params_['activation']
-        learning_rate = grid_result.best_params_['learning_rate']
-        learning_rate_init = grid_result.best_params_['learning_rate_init']
-        self.learning_rate_init = learning_rate_init
-        self.solver = solver
-        self.activation = activation
-        self.learning_rate = learning_rate
+        grid_result = grid.fit(self.x_data_scale, self.data_y_train)
+        self.solver = grid_result.best_params_['solver']
+        self.activation = grid_result.best_params_['activation']
+        self.learning_rate = grid_result.best_params_['learning_rate']
+        self.learning_rate_init = grid_result.best_params_['learning_rate_init']

@@ -39,7 +39,7 @@ class Graphique(Classifieurs):
         clf = self.getAllClassifiers()
         # accuracy_list = list()
         columns = ['Classifieurs', 'Précision (en %)']
-        columns_clf = ['SVM', 'KNN', 'LR', 'NN']
+        columns_clf = ['SVM', 'KNN', 'LR', 'NN', 'ADA', 'RF']
         log = pd.DataFrame(columns=columns)
         i = 0
         for c in clf:

@@ -24,6 +24,10 @@ class Calculs_Classifieurs(Classifieurs):
         self.lr.fit(x_train, y_train)
         print('NN entrainement...')
         self.nn.fit(x_train, y_train)
+        print('AdaBoost entrainement...')
+        self.ada.fit(x_train, y_train)
+        print('Random Forest entrainement...')
+        self.rf.fit(x_train, y_train)
 
     def predict(self):
         """
@@ -49,6 +53,16 @@ class Calculs_Classifieurs(Classifieurs):
         prediction = {str('NN prediction'): ''}
         for n in range(len(self.data_test)):
             class_index = self.nn.predict([X_test.iloc[n]])
+            prediction[str('x[') + str(n) + str(']') +
+                       str(self.id[n])] = self.className[class_index[0]]
+        prediction = {str('ADA prediction'): ''}
+        for n in range(len(self.data_test)):
+            class_index = self.ada.predict([X_test.iloc[n]])
+            prediction[str('x[') + str(n) + str(']') +
+                       str(self.id[n])] = self.className[class_index[0]]
+        prediction = {str('RF prediction'): ''}
+        for n in range(len(self.data_test)):
+            class_index = self.rf.predict([X_test.iloc[n]])
             prediction[str('x[') + str(n) + str(']') +
                        str(self.id[n])] = self.className[class_index[0]]
 
@@ -84,5 +98,13 @@ class Calculs_Classifieurs(Classifieurs):
         print('Cross validation pour le classifieur NN...\n')
         print(self.crossValidationModel(model=self.nn))
         score['NN accuracy: '] = self.crossValidationModel(model=self.nn)
+
+        print('Cross validation pour le classifieur ADA...\n')
+        print(self.crossValidationModel(model=self.ada))
+        score['ADA accuracy: '] = self.crossValidationModel(model=self.ada)
+
+        print('Cross validation pour le classifieur RF...\n')
+        print(self.crossValidationModel(model=self.rf))
+        score['RF accuracy: '] = self.crossValidationModel(model=self.rf)
 
         return score

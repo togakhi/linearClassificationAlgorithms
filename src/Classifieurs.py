@@ -6,6 +6,8 @@
 # Fichier de gestion des classifieurs
 
 # Explication des différentes méthodes présentes dans ce fichier :
+
+
 from Cross_Validation import *
 
 
@@ -34,6 +36,13 @@ class Classifieurs(Cross_Validation):
             self.nn = MLPClassifier(activation=self.activation, solver=self.solver,
                                     learning_rate=self.learning_rate, learning_rate_init=self.learning_rate_init)
 
+            # initialisation du ADA Boost Classifier
+            self.crossValidationAdaBoost()
+            self.ada = AdaBoostClassifier(n_estimators=self.n_estimators, learning_rate=self.learning_rate_ada)
+
+            # initialisation du Random Forest Classifier
+            self.crossValidationRandomForest()
+            self.ada = RandomForestClassifier(n_estimators=self.n_estimators, learning_rate=self.learning_rate_ada)
         else:
             # initialisation du KNN Classifier
             self.knn = KNeighborsClassifier()
@@ -47,9 +56,15 @@ class Classifieurs(Cross_Validation):
             # initialisation du Neural Network Classifier
             self.nn = MLPClassifier()
 
+            # initialisation du AdaBoost Classifier
+            self.ada = AdaBoostClassifier()
+
+            # initialisation du Random Forest Classifier
+            self.rf = RandomForestClassifier()
+
     def getAllClassifiers(self):
         """
         fonction qui retourne les 6 classifieurs sous forme de liste
         :return: liste de classifieurs
         """
-        return [self.svm, self.knn, self.lr, self.nn]
+        return [self.svm, self.knn, self.lr, self.nn, self.ada, self.rf]
