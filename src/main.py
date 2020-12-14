@@ -8,6 +8,10 @@ if __name__ == '__main__':
     '''
     Voici le main qui run notre projet
     '''
+
+    print("============================================================\n"
+          "\t\t\tPARTIE 1 : PREPARATION DES DONNEES\n"
+          "============================================================")
     data = dm()
     print("\nAffichage des données : \n")
     data.printData()
@@ -22,6 +26,10 @@ if __name__ == '__main__':
     print("\nMatrice de corrélation :\n")
     data.correlationMatrix()
 
+    print("\n\n")
+    print("============================================================\n"
+          "\t\t\tPARTIE 2 : LES CLASSIFIEURS\n"
+          "============================================================")
     # print("\n Affichage de l'histogramme...\n")
     # data.univariantePlot()
 
